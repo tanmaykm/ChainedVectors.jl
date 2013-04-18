@@ -8,7 +8,7 @@ Example:
 --------
 
 ````
-using VectorUtils
+julia> using VectorUtils
 
 julia> v1 = [1, 2, 3]
 3-element Int64 Array:
