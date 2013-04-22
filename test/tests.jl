@@ -7,6 +7,13 @@ function test_chained_vector()
     for i in 1:6
         @assert i == cv[i]
     end
+
+    v1 = convert(Vector{Uint8}, "Hello World ")
+    v2 = convert(Vector{Uint8}, "Goodbye World ")
+    cv = ChainedVector{Uint8}(v1, v2)
+    @assert 7 == search(cv, 'W')
+    @assert 21 == search(cv, 'W', 8)
+    @assert 0 == search(cv, 'W', 22)
 end
 
 function test_sub_vector()
@@ -80,10 +87,10 @@ function time_subvect()
 end
 
 test_chained_vector()
-test_sub_vector()
-time_vect()
-time_cv()
-time_subvect()
-time_subarr()
+#test_sub_vector()
+#time_vect()
+#time_cv()
+#time_subvect()
+#time_subarr()
 
 

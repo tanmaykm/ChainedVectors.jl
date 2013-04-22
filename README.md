@@ -2,7 +2,7 @@ VectorUtils are a couple of classes that:
 - chain multiple Vectors to provide a single view (ChainedVector)
 - provide a window view into a Vector (SubVector)
 
-ChainedVector and SubVector do not copy the input array(s). They keep a reference to the array and provide index translations. This approach may be more efficient where avoiding allocation and copying of data result in significant savings, e.g. reading or streaming through a file. 
+ChainedVector and SubVector do not copy the input array(s). They keep a reference to the array and provide index translations. This approach may be more efficient where avoiding allocation and copying of data result in significant savings, e.g. reading or streaming through a file. SubVector is similar to SubArray, but is simpler.
 
 Example:
 --------

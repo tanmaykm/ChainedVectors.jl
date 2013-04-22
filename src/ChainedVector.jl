@@ -57,10 +57,53 @@ function setindex!{T}(cv::ChainedVector{T}, x::T, ind::Integer)
     (cv.chain[cidx])[ind] = x
 end
 
-function append{T}(cv::ChainedVector{T}, v::Vector{T})
+function push!{T}(cv::ChainedVector{T}, v::Vector{T})
     push!(cv.chain, v)
     l = length(v)
     push!(cv.sizes, l)
     cv.sz += l
 end
+
+function pop!{T}(cv::ChainedVector{T})
+    (cv.sz == 0) && error("empty chain")
+    cv.sz -= pop!(cv.sizes)
+    pop!(cv.chain)
+end
+
+function shift!{T}(cv::ChainedVector{T})
+    (cv.sz == 0) && error("empty chain")
+    cv.sz -= shift!(cv.sizes)
+    shift!(cv.chain)
+end
+
+function empty!{T}(cv::ChainedVector{T})
+    if(cv.sz > 0)
+        cv.sz = 0
+        empty!(cv.sizes)
+        empty(cv.chain)
+    end
+    :ok
+end
+
+function search(cv::ChainedVector{Uint8}, b, i::Integer)
+    if i < 1 error(BoundsError) end
+    n = length(cv)
+    if i > n return i == n+1 ? 0 : error(BoundsError) end
+
+    begin_pos = 1
+    for a in cv.chain
+        len = length(a)
+        if((begin_pos + len - 1) >= i)
+            p = pointer(a)
+            offset = (begin_pos >= i) ? 0 : (i - begin_pos)
+            q = ccall(:memchr, Ptr{Uint8}, (Ptr{Uint8}, Int32, Uint), p+offset, b, len-offset)
+            (C_NULL != q) && (return int(q-p+begin_pos))
+        end
+        begin_pos += len
+    end
+    return 0
+end
+
+search(cv::ChainedVector{Uint8}, b) = search(cv,b,1)
+
 
