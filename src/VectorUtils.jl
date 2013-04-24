@@ -5,7 +5,7 @@ import  Base.show, Base.print_matrix,
         Base.similar,
         Base.getindex, Base.setindex!,
         Base.push!, Base.pop!, Base.shift!, Base.empty!,
-        Base.search
+        Base.search, Base.beginswith
 
 export  ChainedVector, SubVector,
         show, print_matrix,
@@ -13,7 +13,7 @@ export  ChainedVector, SubVector,
         similar,
         getindex, setindex!,
         push!, pop!, shift!, empty!,
-        search
+        search, beginswith, beginswithat
 
 include("ChainedVector.jl")
 include("SubVector.jl")
