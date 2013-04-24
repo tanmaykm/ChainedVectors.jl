@@ -87,10 +87,10 @@ function time_subvect()
 end
 
 test_chained_vector()
-#test_sub_vector()
-#time_vect()
-#time_cv()
-#time_subvect()
-#time_subarr()
+test_sub_vector()
+time_vect()
+time_cv()
+time_subvect()
+time_subarr()
 
 
