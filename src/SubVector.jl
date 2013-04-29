@@ -1,17 +1,18 @@
 
-type SubVector{T} <: AbstractVector{T}
-    full::Vector{T}
+immutable SubVector{S<:AbstractVector, T} <: AbstractVector{T}
+    full::S
     start::Int
     len::Int
 
-    function SubVector(arr::Vector{T}, r::Range1{Int})
-        @assert (r.start > 0) && (r.len <= length(arr))
+    function SubVector(arr::AbstractVector{T}, r::Range1{Int})
+        @assert (r.start > 0) && (r.start+r.len-1 <= length(arr))
         new(arr, r.start, r.len)
     end
 end
+SubVector{T}(a::AbstractVector{T}, r::Range1{Int}) = SubVector{typeof(a), T}(a,r)
 
-show{T}(io::IO, sv::SubVector{T}) = println(io, "SubVector of size $(sv.len)")
-function print_matrix{T}(io::IO, sv::SubVector{T}) 
+show(io::IO, sv::SubVector) = println(io, "SubVector of size $(sv.len)")
+function print_matrix(io::IO, sv::SubVector) 
     if(0 == sv.len) 
         println(io, "empty")
     else
@@ -23,28 +24,25 @@ function print_matrix{T}(io::IO, sv::SubVector{T})
     end
 end
 
-size{T}(sv::SubVector{T}) = sv.len
-strides{T}(::SubVector{T}) = (1,)
+size(sv::SubVector) = (sv.len,)
+strides(::SubVector) = (1,)
 
-function stride{T}(::SubVector{T}, n::Integer) 
+function stride(::SubVector, n::Integer) 
     @assert n == 1
     1
 end
 
 function similar{T}(sv::SubVector{T}, tv::Type, dims::(Int, Int)) 
     @assert dims[2] == 1
-    SubVector{tv}(Array(tv, dims[1]), 1:dims[1])
+    SubVector(Array(tv, dims[1]), 1:dims[1])
 end
 
-vec{T}(sv::SubVector{T}) = copy!(Array(T, sv.sz), sv)
+vec{S,T}(sv::SubVector{S,T}) = copy!(Array(T, sv.len), sv)
 
-function getindex{T}(sv::SubVector{T}, ind::Integer)
-    @assert (ind > 0) && (ind <= sv.len)
-    sv.full[ind+sv.start-1]
-end
+getindex(sv::SubVector, ind::Integer) = ((ind > 0) && (ind <= sv.len)) ? (return sv.full[ind+sv.start-1]) : error("Index out of bounds")
 
-function setindex!{T}(sv::SubVector{T}, x::T, ind::Integer)
-    @assert (ind > 0) && (ind <= sv.len)
-    sv.full[ind+sv.start-1] = x
+function setindex!{T}(sv::SubVector, x::T, ind::Integer)
+    (ind > 0) && (ind <= sv.len) && return (sv.full[ind+sv.start-1] = x)
+    error("Index out of bounds")
 end
 

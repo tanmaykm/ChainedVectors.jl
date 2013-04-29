@@ -10,8 +10,8 @@ type ChainedVector{T} <: AbstractVector{T}
     end
 end
 
-show{T}(io::IO, cv::ChainedVector{T}) = println(io, "ChainedVector of size $(cv.sz)")
-function print_matrix{T}(io::IO, cv::ChainedVector{T}) 
+show(io::IO, cv::ChainedVector) = println(io, "ChainedVector of size $(cv.sz)")
+function print_matrix(io::IO, cv::ChainedVector) 
     if(0 == cv.sz) 
         println(io, "empty")
     else
@@ -23,10 +23,10 @@ function print_matrix{T}(io::IO, cv::ChainedVector{T})
     end
 end
 
-size{T}(cv::ChainedVector{T}) = cv.sz
-strides{T}(cv::ChainedVector{T}) = (1,)
+size(cv::ChainedVector) = cv.sz
+strides(cv::ChainedVector) = (1,)
 
-function stride{T}(cv::ChainedVector{T}, n::Integer) 
+function stride(cv::ChainedVector, n::Integer) 
     @assert n == 1
     1
 end
@@ -46,7 +46,7 @@ macro _get_vec_pos(cv, ind)
     end
 end
 
-function getindex{T}(cv::ChainedVector{T}, ind::Integer)
+function getindex(cv::ChainedVector, ind::Integer)
     cidx = @_get_vec_pos cv ind
     (cv.chain[cidx])[ind]
 end
@@ -63,19 +63,19 @@ function push!{T}(cv::ChainedVector{T}, v::Vector{T})
     cv.sz += l
 end
 
-function pop!{T}(cv::ChainedVector{T})
+function pop!(cv::ChainedVector)
     (cv.sz == 0) && error("empty chain")
     cv.sz -= pop!(cv.sizes)
     pop!(cv.chain)
 end
 
-function shift!{T}(cv::ChainedVector{T})
+function shift!(cv::ChainedVector)
     (cv.sz == 0) && error("empty chain")
     cv.sz -= shift!(cv.sizes)
     shift!(cv.chain)
 end
 
-function empty!{T}(cv::ChainedVector{T})
+function empty!(cv::ChainedVector)
     if(cv.sz > 0)
         cv.sz = 0
         empty!(cv.sizes)
