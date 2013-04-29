@@ -1,5 +1,16 @@
 using VectorUtils
 
+macro nogc_elapsed(ex)
+    quote
+        gc_disable()
+        local t0 = time_ns()
+        local val = $(esc(ex))
+        local ret = (time_ns()-t0)/1e9
+        gc_enable(); gc()
+        ret
+    end
+end
+
 function test_chained_vector()
     v1 = [1, 2, 3]
     v2 = [4, 5, 6]
@@ -47,9 +58,18 @@ function test_sub_vector()
     end
 end
 
+function test_fast_sub_vec()
+    v1 = [1, 2, 3, 4, 5, 6]
+    sv = fast_sub_vec(v1, 2:5)
+    for i in 2:5
+        @assert i == sv[i-1]
+    end
+end
+
+
 function time_vect()
     v = zeros(Int, 1024*1024*64)
-    vect_time = @elapsed begin
+    vect_time = @nogc_elapsed begin
         x = 0
         i = 1
         while(i < length(v))
@@ -63,7 +83,7 @@ end
 
 function time_cv()
     cv = ChainedVector{Int}(zeros(Int, 1024*1024*32), zeros(Int, 1024*1024*32))
-    cv_time = @elapsed begin
+    cv_time = @nogc_elapsed begin
         i = 1
         x = 0
         l = length(cv)
@@ -80,7 +100,7 @@ end
 function time_subarr()
     v = zeros(Int, 1024*1024*64)
     sa = sub(v, 2:length(v)-1)
-    sa_time = @elapsed begin
+    sa_time = @nogc_elapsed begin
         i = 1
         x = 0
         l = length(sa)
@@ -96,7 +116,7 @@ end
 function time_subvect()
     v = zeros(Int, 1024*1024*64)
     sa = SubVector(v, 2:length(v)-1)
-    sv_time = @elapsed begin
+    sv_time = @nogc_elapsed begin
         i = 1
         x = 0
         l = length(sa)
@@ -109,10 +129,26 @@ function time_subvect()
     println("SubVector: $sv_time")
 end
 
+function time_fast_sub_vec()
+    v = zeros(Int, 1024*1024*64)
+    sa = fast_sub_vec(v, 2:length(v)-1)
+    sv_time = @nogc_elapsed begin
+        i = 1
+        x = 0
+        l = length(sa)
+        while(i < l)
+            x += sa[i]
+            i += 1
+        end
+        println(x)
+    end
+    println("FastSubVector: $sv_time")
+end
+
 function time_subvect_of_chainedvect()
     cv = ChainedVector{Int}(zeros(Int, 1024*1024*32), zeros(Int, 1024*1024*32))
     sa = SubVector(cv, 2:length(cv)-1)
-    sv_time = @elapsed begin
+    sv_time = @nogc_elapsed begin
         i = 1
         x = 0
         l = length(sa)
@@ -127,10 +163,12 @@ end
 
 test_chained_vector()
 test_sub_vector()
+test_fast_sub_vec()
 time_subvect_of_chainedvect()
 time_vect()
 time_cv()
 time_subvect()
+time_fast_sub_vec()
 time_subarr()
 
 
