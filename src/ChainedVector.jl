@@ -23,13 +23,10 @@ function print_matrix(io::IO, cv::ChainedVector)
     end
 end
 
-size(cv::ChainedVector) = cv.sz
+length(cv::ChainedVector) = cv.sz
+size(cv::ChainedVector) = (cv.sz,)
 strides(cv::ChainedVector) = (1,)
-
-function stride(cv::ChainedVector, n::Integer) 
-    @assert n == 1
-    1
-end
+stride(cv::ChainedVector, n::Integer) = (n > 1) ? cv.sz : 1
 
 function similar{T}(cv::ChainedVector{T}, tv::Type, dims::(Int, Int)) 
     @assert dims[2] == 1
@@ -61,18 +58,27 @@ function push!{T}(cv::ChainedVector{T}, v::Vector{T})
     l = length(v)
     push!(cv.sizes, l)
     cv.sz += l
+    cv
 end
 
 function pop!(cv::ChainedVector)
-    (cv.sz == 0) && error("empty chain")
+    (cv.sz == 0) && error("array is empty")
     cv.sz -= pop!(cv.sizes)
     pop!(cv.chain)
 end
 
 function shift!(cv::ChainedVector)
-    (cv.sz == 0) && error("empty chain")
+    (cv.sz == 0) && error("array is empty")
     cv.sz -= shift!(cv.sizes)
     shift!(cv.chain)
+end
+
+function unshift!{T}(cv::ChainedVector{T}, v::Vector{T})
+    unshift!(cv.chain, v)
+    l = length(v)
+    unshift!(cv.sizes, l)
+    cv.sz += l
+    cv
 end
 
 function empty!(cv::ChainedVector)
@@ -89,7 +95,7 @@ function sub(cv::ChainedVector, r::Range1{Int})
     start_pos = r.start
     cidx = @_get_vec_pos cv start_pos
     if(r.len <= (cv.sizes[cidx]-start_pos+1))
-        return fast_sub_vec(cv.chain[cidx], start_pos:r.len)
+        return fast_sub_vec(cv.chain[cidx], start_pos:(start_pos+r.len-1))
     end
     # else return a safe sub vector
     return SubVector(cv, r)

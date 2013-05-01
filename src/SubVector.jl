@@ -5,8 +5,10 @@ immutable SubVector{S<:AbstractVector, T} <: AbstractVector{T}
     len::Int
 
     function SubVector(arr::AbstractVector{T}, r::Range1{Int})
-        @assert (r.start > 0) && (r.start+r.len-1 <= length(arr))
-        new(arr, r.start, r.len)
+        if((r.start > 0) && (r.start+r.len-1 <= length(arr)))
+            return new(arr, r.start, r.len)
+        end
+        throw(BoundsError())
     end
 end
 SubVector{T}(a::AbstractVector{T}, r::Range1{Int}) = SubVector{typeof(a), T}(a,r)
@@ -24,13 +26,10 @@ function print_matrix(io::IO, sv::SubVector)
     end
 end
 
+length(sv::SubVector) = sv.len
 size(sv::SubVector) = (sv.len,)
 strides(::SubVector) = (1,)
-
-function stride(::SubVector, n::Integer) 
-    @assert n == 1
-    1
-end
+stride(sv::SubVector, n::Integer) = (n > 1) ? sv.len : 1
 
 function similar{T}(sv::SubVector{T}, tv::Type, dims::(Int, Int)) 
     @assert dims[2] == 1
@@ -39,10 +38,6 @@ end
 
 vec{S,T}(sv::SubVector{S,T}) = copy!(Array(T, sv.len), sv)
 
-getindex(sv::SubVector, ind::Integer) = ((ind > 0) && (ind <= sv.len)) ? (return sv.full[ind+sv.start-1]) : error("Index out of bounds")
-
-function setindex!{T}(sv::SubVector, x::T, ind::Integer)
-    (ind > 0) && (ind <= sv.len) && return (sv.full[ind+sv.start-1] = x)
-    error("Index out of bounds")
-end
+getindex(sv::SubVector, ind::Integer) = (0 < ind <= sv.len) ? sv.full[ind+sv.start-1] : throw(BoundsError())
+setindex!{T}(sv::SubVector, x::T, ind::Integer) = (0 < ind <= sv.len) ? (sv.full[ind+sv.start-1] = x) : throw(BoundsError())
 

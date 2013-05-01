@@ -1,19 +1,19 @@
 module VectorUtils
 
 import  Base.show, Base.print_matrix,
-        Base.size, Base.strides, Base.stride,
+        Base.length, Base.size, Base.strides, Base.stride,
         Base.similar, Base.vec,
         Base.getindex, Base.setindex!,
-        Base.push!, Base.pop!, Base.shift!, Base.empty!,
+        Base.push!, Base.pop!, Base.shift!, Base.unshift!, Base.empty!,
         Base.search, Base.beginswith,
         Base.sub
 
 export  ChainedVector, SubVector,
         show, print_matrix,
-        size, strides, stride,
+        length, size, strides, stride,
         similar, vec,
         getindex, setindex!,
-        push!, pop!, shift!, empty!,
+        push!, pop!, shift!, unshift!, empty!,
         search, beginswith, beginswithat,
         fast_sub_vec, sub
 
