@@ -1,10 +1,10 @@
 ChainedVectors consist of a bunch of types that:
-- chain multiple Vectors to provide a single view that appears like a single Vector
-- provide a window view into the chained vector that appears like a single Vector, but may straddle across multiple elements in the chain
+- chain multiple Vectors and make it appear like a single Vector
+- give a window into a portion of the chained vector that appears like a single Vector. The window may straddle across boundaries of multiple elements in the chain.
 
 ChainedVector
 -------------
-Chains together multiple vectors. Only index translation is done and the individual Vectors that constitute the chain are not copied. This can be more efficient in situations where avoiding allocation and copying of data is important. For example, during sequential file reading, ChainedVectors can be used to store file blocks progressively as the file is read, beyond a certain buffered size, remove buffers from the beginning of the chain and resue them to read further blocks ahead in the file. 
+Chains multiple vectors. Only index translation is done and the constituent Vectors are not copied. This can be efficient in situations where avoiding allocation and copying of data is important. For example, during sequential file reading, ChainedVectors can be used to store file blocks progressively as the file is read. As it grows beyond a certain size, buffers from the head of the chain can be removed and resued to read further data at the tail.
 ````
 julia> v1 = [1, 2, 3]
 3-element Int64 Array:
@@ -22,7 +22,6 @@ julia> cv = ChainedVector{Int}(v1, v2)
 6-element Int64 ChainedVector:
 [1, 2, 3, 4, 5, ...]
 
-
 julia> cv[1]
 1
 
@@ -30,12 +29,11 @@ julia> cv[5]
 5
 ````
 
-ChainedVector{Uint8} has specialized methods for search, beginswith, and beginswithat that helps in working with textual data.
+ChainedVector{Uint8} has specialized methods for **search**, **beginswith**, and **beginswithat** that help in working with textual data.
 ````
 julia> cv = ChainedVector{Uint8}(b"Hello World ", b"Goodbye World ")
 26-element Uint8 ChainedVector:
 [0x48, 0x65, 0x6c, 0x6c, 0x6f, ...]
-
 
 julia> search(cv, 'W')
 7
@@ -62,7 +60,7 @@ true
 
 Window view of a ChainedVector
 ------------------------------
-To give out a portion of the data in the ChainedVector as a view, ChainedVector implements the **sub** method as:
+Using the **sub** method, a portion of the data in the ChainedVector can be accessed as a view:
 ````
 sub(cv::ChainedVector, r::Range1{Int})
 ````
@@ -75,19 +73,13 @@ julia> v2 = [7, 8, 9, 10, 11, 12];
 
 julia> cv = ChainedVector{Int}(v1, v2);
 
-julia> 
-
 julia> sv = sub(cv, 3:10)
 8-element Int64 SubVector:
 [3, 4, 5, 6, 7, ...]
 
 
-julia> 
-
 julia> sv[1]
 3
-
-julia> 
 
 julia> # sv[7] is the same as cv[9] and v2[3]
 
@@ -110,9 +102,9 @@ The sub method returns a Vector that indexes into the chained vector at the give
 <dl>
 <dt>SubVector</dt>
 <dd>
-The subvector provides index translations for abstract vectors. 
+Provides index translations for abstract vectors. 
 Example:
-````
+<pre>
 julia> v1 = [1, 2, 3, 4, 5, 6];
 
 julia> sv = SubVector(v1, 2:5)
@@ -128,16 +120,16 @@ julia> sv[1] = 20
 
 julia> v1[2]
 20
-````
+</pre>
 </dd>
-<dt>fast\_sub\_vec</dt>
+<dt>fast_sub_vec</dt>
 <dd>
 Provides an optimized way of creating a Vector that points within another Vector and uses the same underlying data. Since it reuses the same memory locations, it works only on concrete Vectors that give contiguous memory locations. Internally the instance of the view vector is maintained in a WeakKeyDict along with a reference to the larger vector to prevent gc from releasing the parent vector till the view is in use.
 Example:
-````
+<pre>
 julia> v1 = [1, 2, 3, 4, 5, 6];
 
-julia> sv = fast\_sub\_vec(v1, 2:5)
+julia> sv = fast_sub_vec(v1, 2:5)
 4-element Int64 Array:
  2
  3
@@ -154,7 +146,7 @@ julia> sv[1] = 20
 
 julia> println("sv[1]=$(sv[1]), v1[2]=$(v1[2])")
 sv[1]=20, v1[2]=20
-````
+</pre>
 </dd>
 </dl>
 
