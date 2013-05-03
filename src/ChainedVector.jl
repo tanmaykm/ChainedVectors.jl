@@ -87,7 +87,6 @@ function empty!(cv::ChainedVector)
         empty!(cv.sizes)
         empty!(cv.chain)
     end
-    :ok
 end
 
 function sub(cv::ChainedVector, r::Range1{Int})
