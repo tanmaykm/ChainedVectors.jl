@@ -1,4 +1,4 @@
-module VectorUtils
+module ChainedVectors
 
 import  Base.show, Base.print_matrix,
         Base.length, Base.size, Base.strides, Base.stride,

@@ -1,4 +1,4 @@
-using VectorUtils
+using ChainedVectors
 
 function test_chained_vector()
     v1 = [1, 2, 3]

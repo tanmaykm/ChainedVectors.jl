@@ -1,4 +1,4 @@
-using VectorUtils
+using ChainedVectors
 
 const ARRAY_SZ = isempty(ARGS) ? (32*1024*1024) : int(ARGS[1])
 
