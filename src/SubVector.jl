@@ -40,4 +40,5 @@ vec{S,T}(sv::SubVector{S,T}) = copy!(Array(T, sv.len), sv)
 
 getindex(sv::SubVector, ind::Integer) = (0 < ind <= sv.len) ? sv.full[ind+sv.start-1] : throw(BoundsError())
 setindex!{T}(sv::SubVector, x::T, ind::Integer) = (0 < ind <= sv.len) ? (sv.full[ind+sv.start-1] = x) : throw(BoundsError())
+bytestring(sv::SubVector) = bytestring(vec(sv))
 

@@ -47,6 +47,10 @@ function test_sub_vector()
         sv[i-1] += 10
         @assert (10+i) == sv[i-1]
     end
+
+    v2 = b"Hello World"
+    sv = SubVector(v2, 1:5)
+    @assert "Hello" == bytestring(sv)
 end
 
 function test_chained_vector_sub()
