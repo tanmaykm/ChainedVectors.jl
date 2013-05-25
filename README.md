@@ -2,6 +2,10 @@ ChainedVectors consist of a bunch of types that:
 - chain multiple Vectors and make it appear like a single Vector
 - give a window into a portion of the chained vector that appears like a single Vector. The window may straddle across boundaries of multiple elements in the chain.
 
+
+[![Build Status](https://travis-ci.org/tanmaykm/ChainedVectors.jl.png)](https://travis-ci.org/tanmaykm/ChainedVectors.jl)
+
+
 ChainedVector
 -------------
 Chains multiple vectors. Only index translation is done and the constituent Vectors are not copied. This can be efficient in situations where avoiding allocation and copying of data is important. For example, during sequential file reading, ChainedVectors can be used to store file blocks progressively as the file is read. As it grows beyond a certain size, buffers from the head of the chain can be removed and resued to read further data at the tail.
