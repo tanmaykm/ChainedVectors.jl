@@ -11,7 +11,6 @@ before_install:
     - git config --global user.name "Travis User"
     - git config --global user.email "travis@example.net"
 script:
-    - julia -e "Pkg.init()"
-    - mkdir -p ~/.julia/ChainedVectors
-    - cp -R ./* ~/.julia/ChainedVectors/
-    - julia ~/.julia/ChainedVectors/test/tests.jl
+    - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("ChainedVectors"))`); Pkg.pin("ChainedVectors"); Pkg.resolve()'
+    - julia -e 'using ChainedVectors; @assert isdefined(:ChainedVectors); @assert typeof(ChainedVectors) === Module'
+    - julia ./test/tests.jl
