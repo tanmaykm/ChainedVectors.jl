@@ -5,8 +5,8 @@ immutable SubVector{S<:AbstractVector, T} <: AbstractVector{T}
     len::Int
 
     function SubVector(arr::AbstractVector{T}, r::Range1{Int})
-        if((r.start > 0) && (r.start+r.len-1 <= length(arr)))
-            return new(arr, r.start, r.len)
+        if((r.start > 0) && (r.start+length(r)-1 <= length(arr)))
+            return new(arr, r.start, length(r))
         end
         throw(BoundsError())
     end
