@@ -93,8 +93,8 @@ function sub(cv::ChainedVector, r::Range1{Int})
     # if the range does not straddle a chain element boundary, return a fast vector
     start_pos = r.start
     cidx = @_get_vec_pos cv start_pos
-    if(r.len <= (cv.sizes[cidx]-start_pos+1))
-        return fast_sub_vec(cv.chain[cidx], start_pos:(start_pos+r.len-1))
+    if(length(r) <= (cv.sizes[cidx]-start_pos+1))
+        return fast_sub_vec(cv.chain[cidx], start_pos:(start_pos+length(r)-1))
     end
     # else return a safe sub vector
     return SubVector(cv, r)
