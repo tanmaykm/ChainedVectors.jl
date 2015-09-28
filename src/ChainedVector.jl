@@ -1,4 +1,5 @@
 
+
 type ChainedVector{T} <: AbstractVector{T}
     chain::Vector{Vector{T}}
     sizes::Vector{Int}
@@ -30,6 +31,10 @@ stride(cv::ChainedVector, n::Integer) = (n > 1) ? cv.sz : 1
 
 function similar{T}(cv::ChainedVector{T}, tv::Type, dims::(Int, Int)) 
     @assert dims[2] == 1
+    ChainedVector{tv}(Array(tv, dims[1]))
+end
+
+function similar{T}(cv::ChainedVector{T}, tv::Type, dims::(Int, )) 
     ChainedVector{tv}(Array(tv, dims[1]))
 end
 
